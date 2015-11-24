@@ -1,0 +1,23 @@
+<resources>
+    <!-- application level strings -->
+    <string name="app_name">CheckListF</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="set_now">Set Now</string>
+    <string name="full_view">Full View</string>
+    <string name="short_view">Short View</string>
+    <string name="set_checklist">Set Checklist</string>
+    <string name="import_db">Import Data Base</string>
+    <string name="export_db">Export Data Base</string>
+
+    <!-- multiple use strings -->
+    <string name="hello_world">Hello world!</string>
+    <string name="button_use">USE</string>
+    <string name="button_abort">ABORT</string>
+
+    <!-- fragment_list_item strings -->
+    <string name="list_item_title">Title</string>
+    <string name="list_item_checking">Item Checking</string>
+    <string name="list_item_checked">Checked</string>
+    <string name="list_item_desc">Description</string>
+</resources>

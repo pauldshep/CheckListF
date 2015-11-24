@@ -1,0 +1,188 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              tools:context="com.sss.android.checklistf.ListItemDlgFragment"
+              android:orientation="vertical"
+              android:weightSum="1">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/list_item_title"
+        android:id="@+id/textViewTitle"
+        android:layout_weight="0.03"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextTitle"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/list_item_desc"
+        android:id="@+id/textViewDesc"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"
+        android:textColor="@android:color/black"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:id="@+id/editTextDesc"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/list_item_checking"
+        android:id="@+id/textViewItemChecking"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"
+        android:textColor="@android:color/black"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/list_item_checked"
+        android:id="@+id/checkBoxChecked"
+        />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <TextView
+            android:layout_width="85dp"
+            android:layout_height="match_parent"
+            android:text="Units"
+            android:id="@+id/textViewUnits"
+            android:gravity="center_vertical"
+            android:textColor="@android:color/black"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editTextUnits"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.03"
+            android:text="Interval Units"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <TextView
+            android:layout_width="85dp"
+            android:layout_height="match_parent"
+            android:text="Interval"
+            android:id="@+id/textViewInterval"
+            android:gravity="center_vertical"
+            android:textColor="@android:color/black"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editTextInterval"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.03"
+            android:text="Interval Value"/>
+
+    </LinearLayout>
+
+
+    <!-- Last Checked Parameters -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:text="Last Check"
+        android:id="@+id/textViewLastCheck"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="@android:color/black"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <TextView
+            android:layout_width="85dp"
+            android:layout_height="match_parent"
+            android:text="Interval Stamp"
+            android:id="@+id/textViewIntervalStamp"
+            android:gravity="center_vertical"
+            android:textColor="@android:color/black"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editTextIntervalStamp"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.03"
+            android:text="Interval Stamp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <TextView
+            android:layout_width="85dp"
+            android:layout_height="match_parent"
+            android:text="Time Stamp"
+            android:id="@+id/textViewTimeStamp"
+            android:gravity="center_vertical"
+            android:textColor="@android:color/black"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editTextTimeStamp"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.03"
+            android:text="Time Stamp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_use"
+            android:id="@+id/buttonListItemUse"
+            android:layout_marginTop="10dp"
+            android:layout_weight=".5"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_abort"
+            android:id="@+id/buttonListItemAbort"
+            android:layout_marginTop="10dp"
+            android:layout_weight=".5"/>
+    </LinearLayout>
+
+</LinearLayout>
