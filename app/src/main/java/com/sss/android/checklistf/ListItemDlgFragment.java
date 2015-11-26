@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -31,12 +32,12 @@ public class ListItemDlgFragment extends DialogFragment
 
     // Parameter variables
     private CheckListItem mCheckListItem;
+    private Button        mButtonUse;
+    private Button        mButtonAbort;
 
     // system variables
-    private Context       mContext;
-
-    // private OnFragmentInteractionListener mListener;
-    OnCheckListItemEditedListener   mOnEditedListener;
+    private Context                         mContext;
+    private OnCheckListItemEditedListener   mOnEditedListener;
 
 
     //==========================================================================
@@ -85,6 +86,10 @@ public class ListItemDlgFragment extends DialogFragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+
+
+        // get the check list item to display from savedInstatnceState
         if(getArguments() != null)
         {
             mCheckListItem = new CheckListItem(savedInstanceState);
@@ -150,6 +155,32 @@ public class ListItemDlgFragment extends DialogFragment
         EditText item_time = (EditText)view.findViewById(R.id.editTextTimeStamp);
         item_time.setText(new Date(mCheckListItem.mCheckTime).toString());
 
+        //----------------------------------------------------------------------
+        // setup message handlers
+        //----------------------------------------------------------------------
+        mButtonUse = (Button)view.findViewById(R.id.buttonListItemUse);
+        mButtonUse.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Log.d(TAG, "ButtonUse.onClick()");
+                mOnEditedListener.onCheckListItemEdited(mCheckListItem);
+                dismiss();
+            }
+        });
+
+        mButtonAbort = (Button)view.findViewById(R.id.buttonListItemAbort);
+        mButtonAbort.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Log.d(TAG, "ButtonAbort.onClick()");
+                dismiss();
+            }
+        });
+
         return view;
     }  // end public View onCreateView(...
 
@@ -181,11 +212,12 @@ public class ListItemDlgFragment extends DialogFragment
     //==========================================================================
     /**
      * Called as the first indication that the user is leaving the fragment.
-     * Changes to the CheckListItem are comitted here
+     * Changes to the CheckListItem are comitted here?
      */
     @Override
     public void onPause()
     {
+        super.onPause();
         Log.d(TAG, "onPause()");
 
     }  // end public void onPause()

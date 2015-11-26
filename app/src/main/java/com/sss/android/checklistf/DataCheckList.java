@@ -59,6 +59,7 @@ public class DataCheckList
     private int                      mIteratorIndex = 0;
 
 
+    //==========================================================================
     /**
      * Get single instance of DataCheckList.  If it doesn't already exist
      * then create one.
@@ -76,6 +77,7 @@ public class DataCheckList
     }   // end public static DataCheckList get(Context context)
 
 
+    //==========================================================================
     /**
      * Private Constructor for singleton called by static get() function
      *
@@ -449,7 +451,8 @@ public class DataCheckList
         {
             // get Crime info from database
             String  uuidString  = getString(getColumnIndex(DatabaseSchema.TableCheckList.Cols.UUID));
-            UUID    uuid        = UUID.fromString(uuidString);
+            //UUID    uuid        = UUID.fromString(uuidString);
+            UUID    uuid        = UUID.randomUUID();
 
             int     is_checked  = getInt(getColumnIndex(DatabaseSchema.TableCheckList.Cols.CHECKED));
             boolean checked     = is_checked == 1 ? true : false;

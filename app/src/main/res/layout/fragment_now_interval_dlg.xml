@@ -1,0 +1,103 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context="com.sss.android.checklistf.NowIntervalDlgFragment"
+              android:weightSum="1">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/interval_title"
+        android:id="@+id/textViewIntervalTitle"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"/>
+
+
+    <!-- Check List Interval Units -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/interval_units"
+            android:id="@+id/textViewIntervalUnitsTitle"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"/>
+            android:layout_marginLeft="10dp"
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/interval_units_desc"
+            android:id="@+id/textViewIntervalUnits"
+            android:layout_marginLeft="10dp"/>
+
+    </LinearLayout>
+
+
+    <!-- Check List Interval Value -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/interval_now"
+        android:id="@+id/textViewIntervalValueTitle"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"/>
+        android:layout_marginLeft="10dp"
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:text="@string/interval_now_desc"
+        android:ems="10"
+        android:id="@+id/editTextIntervalValue"
+        android:layout_marginLeft="10dp"/>
+        android:layout_marginRight="10dp"
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_use"
+            android:id="@+id/buttonIntervalUse"
+            android:layout_marginTop="10dp"
+            android:layout_weight=".5"
+            android:layout_marginLeft="10dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_abort"
+            android:id="@+id/buttonIntervalAbort"
+            android:layout_marginTop="10dp"
+            android:layout_weight=".5"
+            android:layout_marginRight="10dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

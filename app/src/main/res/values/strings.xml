@@ -20,4 +20,12 @@
     <string name="list_item_checking">Item Checking</string>
     <string name="list_item_checked">Checked</string>
     <string name="list_item_desc">Description</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="interval_title">Check Interval Parameters</string>
+    <string name="interval_units">Units: </string>
+    <string name="interval_units_desc">check list interval units string</string>
+    <string name="interval_now">Now: </string>
+    <string name="interval_now_desc">check list interval stamp integer</string>
+
 </resources>
