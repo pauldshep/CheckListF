@@ -3,12 +3,13 @@
     <string name="app_name">CheckListF</string>
     <string name="action_settings">Settings</string>
 
+    <!-- menu options -->
     <string name="set_now">Set Now</string>
     <string name="full_view">Full View</string>
     <string name="short_view">Short View</string>
     <string name="set_checklist">Set Checklist</string>
-    <string name="import_db">Import Data Base</string>
-    <string name="export_db">Export Data Base</string>
+    <string name="import_checklist">Import Checklist</string>
+    <string name="export_checklist">Export Checklist</string>
 
     <!-- multiple use strings -->
     <string name="hello_world">Hello world!</string>

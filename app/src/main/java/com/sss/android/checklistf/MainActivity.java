@@ -1,5 +1,8 @@
 package com.sss.android.checklistf;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.DialogFragment;
@@ -8,6 +11,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.io.File;
 
 
 public class MainActivity extends AppCompatActivity
@@ -101,6 +106,15 @@ public class MainActivity extends AppCompatActivity
                 setNowIntervalStamp();
                 return true;
 
+            case R.id.import_checklist:
+                Log.d(TAG, "import checklist");
+                importChecklist();
+                return true;
+
+            case R.id.export_checklist:
+                exportChecklist();
+                return true;
+
             case R.id.full_view:
                 Log.d(TAG, "full view");
                 return true;
@@ -111,14 +125,6 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.set_checklist:
                 Log.d(TAG, "set checklist");
-                return true;
-
-            case R.id.import_db:
-                Log.d(TAG, "import database");
-                return true;
-
-            case R.id.export_db:
-                Log.d(TAG, "export database");
                 return true;
 
             default:
@@ -173,6 +179,7 @@ public class MainActivity extends AppCompatActivity
      */
     private void setNowIntervalStamp()
     {
+        Log.d(TAG, "setNowIntervalStamp()");
         FragmentTransaction frag_trans = getSupportFragmentManager().beginTransaction();
 
         // remove any existing instances of the dialog
@@ -192,5 +199,37 @@ public class MainActivity extends AppCompatActivity
 
 
     }  // end private void setNowIntervalStamp()
+
+
+    //=========================================================================
+    /**
+     * Import checklist parameters from xml file
+     */
+    private void importChecklist()
+    {
+        Log.d(TAG, "importChecklist()");
+        File file = new File(Environment.DIRECTORY_DOCUMENTS);
+    }
+
+
+    //=========================================================================
+    /**
+     * Exports the current checklist.  A list of email clients is displayed
+     */
+    private void exportChecklist()
+    {
+        Log.d(TAG, "exportCheckList()");
+
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("message/rfc822");
+        i.putExtra(Intent.EXTRA_EMAIL, "pauldshep@gmail.com");
+        i.putExtra(Intent.EXTRA_SUBJECT, "Check List Data");
+        i.putExtra(Intent.EXTRA_TEXT, "This is the Check List Data in XML");
+
+        // add the XML checklist description attachment here
+        // i.putExtra(Intent.EXTRA_STREAM, FILE_URI);
+
+        startActivity(Intent.createChooser(i, "Choose Export Client"));
+    }
 
 }  // end public class MainActivity extends AppCompatActivity
