@@ -215,6 +215,8 @@ public class MainActivity extends AppCompatActivity
     //=========================================================================
     /**
      * Exports the current checklist.  A list of email clients is displayed
+     * for the user to select.  The CheckList data is mailed to the specified
+     * location as an attachment to the email.
      */
     private void exportChecklist()
     {
@@ -230,6 +232,6 @@ public class MainActivity extends AppCompatActivity
         // i.putExtra(Intent.EXTRA_STREAM, FILE_URI);
 
         startActivity(Intent.createChooser(i, "Choose Export Client"));
-    }
+    }   // end private void exportChecklist()
 
 }  // end public class MainActivity extends AppCompatActivity
