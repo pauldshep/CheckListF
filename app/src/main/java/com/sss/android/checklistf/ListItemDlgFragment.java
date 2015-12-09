@@ -1,9 +1,46 @@
+/*******************************************************************************
+ * Copyright (c) 2015 Shepherd Software Solutions (S3). All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *   - Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *   - Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *
+ *   - Neither the name of Shepherd Software Solutions or the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+ * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ******************************************************************************/
 package com.sss.android.checklistf;
 
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,10 +48,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 
 
@@ -28,17 +68,24 @@ import java.util.Date;
  */
 public class ListItemDlgFragment extends DialogFragment
 {
-    private final static String TAG = "ListItemDlgFragment";
+    private final static String TAG                 = "ListItemDlgFragment";
+    private final static String KEY_PHOTO_BITMAP    = "key_photo_bitmap";
+    private final static String KEY_PHOTO_FILE_PATH = "key_photo_file_path";
+    private final static int    TAG_REQUEST_PHOTO   = 1;
 
-    // Parameter variables
+
+    // GUI Parameter variables
     private CheckListItem mCheckListItem;
-    private Button        mButtonUse;
-    private Button        mButtonAbort;
+    private ImageView     mPhotoView;
+    private ImageButton   mImageButtonTakePicture;
+    private Bitmap        mPhotoBitmap;
 
     // system variables
     private Context                         mContext;
     private OnCheckListItemEditedListener   mOnEditedListener;
-
+    private String                          mPhotoFileName;
+    private String                          mPhotoFilePath;
+    private File                            mPhotoFile;
 
     //==========================================================================
     /**
@@ -79,14 +126,11 @@ public class ListItemDlgFragment extends DialogFragment
     //==========================================================================
     /**
      * Called when the fragment is created
-     *
-     * @param savedInstanceState
      */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
 
 
         // get the check list item to display from savedInstatnceState
@@ -110,10 +154,6 @@ public class ListItemDlgFragment extends DialogFragment
     /**
      * Builds Fragment View for display by the application.  Called when it's
      * time for the fragment to draw its user interface for the first time.
-     *
-     * @param inflater
-     * @param container
-     * @param savedInstanceState
      *
      * @return initialized fragment view for display
      */
@@ -155,11 +195,8 @@ public class ListItemDlgFragment extends DialogFragment
         EditText item_time = (EditText)view.findViewById(R.id.editTextTimeStamp);
         item_time.setText(new Date(mCheckListItem.mCheckTime).toString());
 
-        //----------------------------------------------------------------------
-        // setup message handlers
-        //----------------------------------------------------------------------
-        mButtonUse = (Button)view.findViewById(R.id.buttonListItemUse);
-        mButtonUse.setOnClickListener(new View.OnClickListener()
+        Button button_use = (Button)view.findViewById(R.id.buttonListItemUse);
+        button_use.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -170,8 +207,8 @@ public class ListItemDlgFragment extends DialogFragment
             }
         });
 
-        mButtonAbort = (Button)view.findViewById(R.id.buttonListItemAbort);
-        mButtonAbort.setOnClickListener(new View.OnClickListener()
+        Button button_abort = (Button)view.findViewById(R.id.buttonListItemAbort);
+        button_abort.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -181,15 +218,106 @@ public class ListItemDlgFragment extends DialogFragment
             }
         });
 
+
+        //----------------------------------------------------------------------
+        // ImageView that displays the thumbnail of the picture associated
+        // with the checklist item
+        //----------------------------------------------------------------------
+        mPhotoView = (ImageView)view.findViewById(R.id.imageViewItem);
+
+        if((savedInstanceState != null))
+        {
+            if(savedInstanceState.containsKey(KEY_PHOTO_BITMAP))
+            {
+                mPhotoBitmap = (Bitmap)savedInstanceState.get(KEY_PHOTO_BITMAP);
+            }
+            if(savedInstanceState.containsKey(KEY_PHOTO_FILE_PATH))
+            {
+                mPhotoFilePath = savedInstanceState.getString(KEY_PHOTO_FILE_PATH);
+            }
+        }
+
+        mPhotoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // display item image viewer/editor implemented as a fragment dialog
+                Log.d(TAG, "mImageViewItem::onClick()");
+            }
+        });
+
+        //----------------------------------------------------------------------
+        // ImageButton that causes a picture to be taken to associate with
+        // the check list item.
+        //----------------------------------------------------------------------
+        mImageButtonTakePicture = (ImageButton)view.findViewById(R.id.imageButtonTakePicture);
+        mImageButtonTakePicture.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Log.d(TAG, "mImageButtonTakePicture::onClick()");
+                final Intent   captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                PackageManager pkgMgr       = getActivity().getPackageManager();
+
+                // verify there is a camera available to take the picture
+                if(captureImage.resolveActivity(pkgMgr) != null)
+                {
+                    // this gets the full bitmap of the camera image, not just
+                    // a thumb nail, and saves it to the specified file.
+                    Uri uri = createFileForPhotograph();
+                    captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                    startActivityForResult(captureImage, TAG_REQUEST_PHOTO);
+                }
+            }
+        });
+
+        updateChecklistItemPhoto();
         return view;
     }  // end public View onCreateView(...
+
+
+    //==========================================================================
+    /**
+     * Processes the activity result from a call to startActivityForResult()
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        switch(requestCode)
+        {
+            case TAG_REQUEST_PHOTO:
+                Log.d(TAG, "onActivityResult(requestCode = TAG_REQUEST_PHOTO)");
+                Log.d(TAG, "onActivityResult(resultCode = " + resultCode + ")");
+                if(resultCode == Activity.RESULT_OK)
+                {
+                    updateChecklistItemPhoto();
+                }
+                break;
+
+            default:
+                Log.e(TAG, "onActivityResult()::unsupported request code = " + requestCode);
+                break;
+        }
+    }   // end public void onActivityResult(int requestCode, int resultCode, Intent data)
+
+
+    //==========================================================================
+    /**
+     * Called to save information between screen rotations
+     */
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState)
+    {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putParcelable(KEY_PHOTO_BITMAP,    mPhotoBitmap);
+        savedInstanceState.putString(KEY_PHOTO_FILE_PATH, mPhotoFilePath);
+    }
+
 
     //==========================================================================
     /**
      * Called once the fragment is associated with its activity.  Note that
      * Activity is a subclass of Context
-     *
-     * @param context
      */
     @Override
     public void onAttach(Context context)
@@ -269,5 +397,82 @@ public class ListItemDlgFragment extends DialogFragment
 //        // TODO: Update argument type and name
 //        public void onFragmentInteraction(Uri uri);
 //    }
+
+
+    //==========================================================================
+    /**
+     * Updates the checklist item photo from the bitmap file
+     */
+    private void updateChecklistItemPhoto()
+    {
+        Log.d(TAG, "updateChecklistItemPhoto(file path = " + mPhotoFilePath + ")");
+        if(mPhotoFilePath == null)  return;
+        if(mPhotoView     == null)  return;
+
+        // get the dimensions of the display ImageView
+        int targetW = mPhotoView.getMaxWidth();
+        int targetH = mPhotoView.getMaxHeight();
+        Log.d(TAG, "updateChecklistItemPhoto(targetW = " + targetW +
+                                          ", targetH = " + targetH + ")");
+
+        // get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds    = true;
+        BitmapFactory.decodeFile(mPhotoFilePath, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+        Log.d(TAG, "updateChecklistItemPhoto(photoW = " + photoW +
+                                          ", photoH = " + photoH + ")");
+
+        // calculate bitmap scale factor so it will fit in the ImageView
+        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+        Log.d(TAG, "updateChecklistItemPhoto(scale factor = " + scaleFactor + ")");
+
+        // decode the image file to a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize       = scaleFactor;
+
+        mPhotoBitmap = BitmapFactory.decodeFile(mPhotoFilePath, bmOptions);
+
+        if(mPhotoBitmap != null)
+        {
+            mPhotoView.setImageBitmap(mPhotoBitmap);
+        }
+    }
+
+
+    //==========================================================================
+    /**
+     * Create file to save check list item photograph based on the item UUID.
+     * @return universal resource identifier (Uri) for the photograph file
+     */
+    private Uri createFileForPhotograph()
+    {
+        File pict_dir;
+
+        // Here the storage directory is the public pictures directory that
+        // can be accessed by any program.
+        //pict_dir = Environment.getExternalStoragePublicDirectory(
+        //      Environment.DIRECTORY_PICTURES);
+
+        // Here the stroage directory is the private storage that only this
+        // application can access.  Information in this directory is lost if
+        // the app is uninstalled.
+        pict_dir = getContext().getExternalFilesDir(
+                Environment.DIRECTORY_PICTURES);
+
+        if(pict_dir == null) return null;
+
+
+        // try to create the file for the picture
+        mPhotoFileName = mCheckListItem.buildFileName();
+        mPhotoFile     = new File(pict_dir, mPhotoFileName);
+        mPhotoFilePath = mPhotoFile.getAbsolutePath();
+
+        Log.d(TAG, "createFileForPhotograph(file = " + mPhotoFilePath + ")");
+
+        return Uri.fromFile(mPhotoFile);
+    }   // end private Uri createFileForPhotograph()
+
 
 }

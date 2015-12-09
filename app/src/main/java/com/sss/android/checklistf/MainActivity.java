@@ -1,7 +1,6 @@
 package com.sss.android.checklistf;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -16,8 +15,8 @@ import java.io.File;
 
 
 public class MainActivity extends AppCompatActivity
-        implements ListItemDlgFragment.OnCheckListItemEditedListener,
-        NowIntervalDlgFragment.OnIntervalNowEditedListener
+        implements  ListItemDlgFragment.OnCheckListItemEditedListener,
+                    NowIntervalDlgFragment.OnIntervalNowEditedListener
 {
     private final static String TAG = "MainActivity";
 
@@ -32,6 +31,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate()");
 
         //---------------------------------------------------------------------
         // Set initial view from layout resource.  Note this fragment cannot

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -35,10 +36,11 @@ public class NowIntervalDlgFragment extends DialogFragment
     private Integer mIntervalValue;
 
     // access to dialog UI elements
-    private TextView mTextViewIntervalUnits;
-    private EditText mEditTextIntervalValue;
-    private Button   mButtonIntervalUse;
-    private Button   mButtonIntervalAbort;
+    private TextView  mTextViewIntervalUnits;
+    private EditText  mEditTextIntervalValue;
+    private Button    mButtonIntervalUse;
+    private Button    mButtonIntervalAbort;
+    private ImageView mImageViewItem;
 
     // fragment system variables
     private OnIntervalNowEditedListener mOnIntervalNowEditedListener;

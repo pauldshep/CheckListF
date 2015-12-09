@@ -178,7 +178,7 @@ public class MainActivityFragment extends Fragment
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
             {
-                Toast.makeText(mContext, "ListView OnItemLongClick", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(mContext, "ListView OnItemLongClick", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "onItemLongClick");
 
                 // create the list item editor fragment to display/edit the

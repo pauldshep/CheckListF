@@ -57,7 +57,7 @@ public class CheckListItem
     public final static String PARM_CHECKTIME     = "PARM_CHECKTIME";
 
     // parameters associated with a check list item
-    public UUID    mUUID          = new UUID(0,0);
+    public UUID    mUUID          = UUID.randomUUID();
     public String  mTitle         = "Item Title";
     public String  mDesc          = "Item Description";
     public Boolean mChecked       = false;
@@ -75,7 +75,7 @@ public class CheckListItem
      */
     public CheckListItem()
     {
-        mUUID          = new UUID(0,0);
+        mUUID          = UUID.randomUUID();
         mTitle         = "No Title";
         mDesc          = "No Description";
         mChecked       = false;
@@ -131,6 +131,15 @@ public class CheckListItem
     {
         if(bundle != null)
         {
+            if(bundle.containsKey(PARM_UUID))
+            {
+                mUUID      = UUID.fromString(bundle.getString(PARM_UUID));
+            }
+            else
+            {
+                mUUID      = UUID.randomUUID();
+            }
+
             mTitle         = bundle.getString(PARM_TITLE);
             mDesc          = bundle.getString(PARM_DESC);
             mChecked       = bundle.getBoolean(PARM_CHECKED);
@@ -154,6 +163,7 @@ public class CheckListItem
     {
         Bundle bundle = new Bundle();
 
+        bundle.putString(PARM_UUID,       mUUID.toString());
         bundle.putString(PARM_TITLE,      mTitle);
         bundle.putString(PARM_DESC,       mDesc);
         bundle.putBoolean(PARM_CHECKED,   mChecked);
@@ -163,6 +173,16 @@ public class CheckListItem
         bundle.putLong(PARM_CHECKTIME,    mCheckTime);
 
         return bundle;
+    }
+
+
+    //==========================================================================
+    /**
+     * Builds file name for the picture associated with this check list item
+     */
+    public String buildFileName()
+    {
+        return "IMG_" + mUUID.toString() + ".jpg";
     }
 
 

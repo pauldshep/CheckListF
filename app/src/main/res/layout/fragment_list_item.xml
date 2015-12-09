@@ -6,21 +6,49 @@
               android:orientation="vertical"
               android:weightSum="1">
 
-    <TextView
+    <!-- horizontal title and picture -->
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/list_item_title"
-        android:id="@+id/textViewTitle"
-        android:layout_weight="0.03"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"/>
+        android:orientation="horizontal">
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/editTextTitle"
-        />
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/imageViewItem"
+            android:src="@drawable/ic_default_image"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:maxHeight="100dp"
+            android:maxWidth="100dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/list_item_title"
+            android:id="@+id/textViewTitle"
+            android:layout_weight="0.03"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_toEndOf="@+id/imageViewItem"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/imageViewItem"
+            android:paddingTop="10dp" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editTextTitle"
+            android:layout_toEndOf="@+id/imageViewItem"
+            android:layout_below="@+id/textViewTitle"
+            android:hint="title of check list item"
+            android:layout_alignBottom="@+id/imageViewItem" />
+
+    </RelativeLayout>
+
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -162,6 +190,7 @@
 
     </LinearLayout>
 
+    <!-- button bar along bottom of dialog -->
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -170,19 +199,30 @@
 
         <Button
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text="@string/button_use"
             android:id="@+id/buttonListItemUse"
             android:layout_marginTop="10dp"
-            android:layout_weight=".5"/>
+            android:layout_weight=".4"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/imageButtonTakePicture"
+            android:layout_weight=".2"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/ic_take_picture"
+            />
 
         <Button
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text="@string/button_abort"
             android:id="@+id/buttonListItemAbort"
             android:layout_marginTop="10dp"
-            android:layout_weight=".5"/>
+            android:layout_weight=".4"
+            />
     </LinearLayout>
 
 </LinearLayout>
