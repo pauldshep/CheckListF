@@ -126,22 +126,27 @@ public class ListItemDlgFragment extends DialogFragment
     //==========================================================================
     /**
      * Called when the fragment is created
+     * @param savedInstanceState saved instance state, not arguments
      */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        Log.d(TAG, "onCreate(args = " + args.toString() + ")");
 
 
         // get the check list item to display from savedInstatnceState
-        if(getArguments() != null)
+        if(args != null)
         {
-            mCheckListItem = new CheckListItem(savedInstanceState);
+            mCheckListItem = new CheckListItem(args);
+            Log.d(TAG, "mCheckListItem = " + mCheckListItem.toString());
         }
         else
         {
             // SNO
             mCheckListItem = new CheckListItem();
+            Log.e(TAG, "no bundle arguments, creating a new CheckListItem");
         }
 
         int style = DialogFragment.STYLE_NO_FRAME, theme = 0;
@@ -162,17 +167,18 @@ public class ListItemDlgFragment extends DialogFragment
                              ViewGroup      container,
                              Bundle         savedInstanceState)
     {
-        Log.d(TAG, "onCreateView(): CheckListItem = " + mCheckListItem.toString());
+        Log.d(TAG, "onCreateView(mCheckListItem = " + mCheckListItem.toString() + ")");
+
         // Inflate the layout for this fragment
         mContext  = getActivity().getApplicationContext();
         View view = inflater.inflate(R.layout.fragment_list_item, container, false);
 
-        // set list item title
-        EditText item_title = (EditText)view.findViewById(R.id.editTextTitle);
+        // set checklist item title
+        final EditText item_title = (EditText)view.findViewById(R.id.editTextTitle);
         item_title.setText(mCheckListItem.mTitle);
 
-        // set list item description
-        EditText item_desc = (EditText)view.findViewById(R.id.editTextDesc);
+        // set checklist item long description
+        final EditText item_desc = (EditText)view.findViewById(R.id.editTextDesc);
         item_desc.setText(mCheckListItem.mDesc);
 
         // set list item checked
@@ -195,18 +201,30 @@ public class ListItemDlgFragment extends DialogFragment
         EditText item_time = (EditText)view.findViewById(R.id.editTextTimeStamp);
         item_time.setText(new Date(mCheckListItem.mCheckTime).toString());
 
+
+        //----------------------------------------------------------------------
+        // USE Button:  Save and changes made to the CheckList item and dismiss
+        // the dialog.
+        //----------------------------------------------------------------------
         Button button_use = (Button)view.findViewById(R.id.buttonListItemUse);
         button_use.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                Log.d(TAG, "ButtonUse.onClick()");
+                mCheckListItem.mTitle = item_title.getText().toString();
+                mCheckListItem.mDesc  = item_desc.getText().toString();
+                Log.d(TAG, "ButtonUse.onClick(mCheckListItem = " + mCheckListItem.toString() + ")");
                 mOnEditedListener.onCheckListItemEdited(mCheckListItem);
                 dismiss();
             }
         });
 
+
+        //----------------------------------------------------------------------
+        // ABORT Button:  Discard and changes made to the ListItem and dismiss
+        // the dialog
+        //----------------------------------------------------------------------
         Button button_abort = (Button)view.findViewById(R.id.buttonListItemAbort);
         button_abort.setOnClickListener(new View.OnClickListener()
         {
@@ -309,8 +327,8 @@ public class ListItemDlgFragment extends DialogFragment
     public void onSaveInstanceState(Bundle savedInstanceState)
     {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putParcelable(KEY_PHOTO_BITMAP,    mPhotoBitmap);
-        savedInstanceState.putString(KEY_PHOTO_FILE_PATH, mPhotoFilePath);
+        savedInstanceState.putParcelable(KEY_PHOTO_BITMAP, mPhotoBitmap);
+        savedInstanceState.putString(KEY_PHOTO_FILE_PATH,  mPhotoFilePath);
     }
 
 
@@ -437,6 +455,7 @@ public class ListItemDlgFragment extends DialogFragment
         if(mPhotoBitmap != null)
         {
             mPhotoView.setImageBitmap(mPhotoBitmap);
+            mCheckListItem.mPhotoFilePath = mPhotoFilePath;
         }
     }
 

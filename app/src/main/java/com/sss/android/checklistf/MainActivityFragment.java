@@ -30,7 +30,6 @@
  ******************************************************************************/
 package com.sss.android.checklistf;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -53,7 +52,7 @@ import android.support.v4.app.DialogFragment;
 public class MainActivityFragment extends Fragment
 {
     // class information for the trace
-    private final static String TAG = "ActivityMain";
+    private final static String TAG = "MainActivityFragment";
 
     private ListView        mListView;
     private DataCheckList   mDataCheckList;
@@ -65,7 +64,6 @@ public class MainActivityFragment extends Fragment
     /**
      * Use this factory method to create a new instance of this fragment using
      * the provided parameters.
-     *
      * @return A new instance of fragment MainActivityFragment.
      */
     public static MainActivityFragment newInstance()
@@ -73,11 +71,9 @@ public class MainActivityFragment extends Fragment
         MainActivityFragment fragment = new MainActivityFragment();
 
         // set parameters to be passed to the fragment
-        // Bundle            args     = new Bundle();
-        // args.putString(LIST_ITEM_TITLE,    checkListItem.getTitle());
-        // args.putBoolean(LIST_ITEM_CHECKED, checkListItem.getChecked());
-        // args.putString(LIST_ITEM_DESC,     checkListItem.getDesc());
-        // fragment.setArguments(args);
+        //Bundle args = new Bundle();
+        //args.putParcelable(KEY_DATA_CHECKLIST, dataCheckList);
+        //fragment.setArguments(args);
 
         return fragment;
     }
@@ -105,13 +101,12 @@ public class MainActivityFragment extends Fragment
         //setContentView(R.layout.activity_main);
 
         Log.d(TAG, "OnCreateView()");
+        View view      = inflater.inflate(R.layout.fragment_main, container, false);
 
-        // get debug checklist data
-        mContext  = getActivity().getApplicationContext();
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        // get checklist data
+        mContext       = getActivity().getApplicationContext();
         mDataCheckList = DataCheckList.get(mContext);
-        mDataCheckList.populateForDebug();
-        mDataCheckList.getFromDatabase();
+
 
         // set checklist title & display at top of view
         TextView chklst_name = (TextView)view.findViewById(R.id.text_view_chklist_name);
@@ -171,6 +166,8 @@ public class MainActivityFragment extends Fragment
             }
         });
 
+
+        //----------------------------------------------------------------------
         // set ListView on long click message handler
         mListView.setLongClickable(true);
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
@@ -179,18 +176,18 @@ public class MainActivityFragment extends Fragment
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
             {
                 // Toast.makeText(mContext, "ListView OnItemLongClick", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "onItemLongClick");
+                Log.d(TAG, "onItemLongClick()");
 
                 // create the list item editor fragment to display/edit the
                 // currently selected list item
                 CheckListItem list_item = (CheckListItem)mAdapterFullView.getItem(position);
-                ListItemDlgFragment list_item_frag = ListItemDlgFragment.newInstance(list_item);
+                Log.d(TAG, "list item = " + list_item.toString());
 
                 // display the dialog fragment
                 FragmentTransaction frag_trans = getFragmentManager().beginTransaction();
 
                 // remove any existing instances of the dialog
-                Fragment pre_dlg = getFragmentManager().findFragmentByTag("dialog");
+                Fragment pre_dlg = getFragmentManager().findFragmentByTag("list_item_dialog");
                 if(pre_dlg != null)
                 {
                     frag_trans.remove(pre_dlg);
@@ -198,7 +195,7 @@ public class MainActivityFragment extends Fragment
 
                 // display the dialog
                 DialogFragment list_item_dlg = ListItemDlgFragment.newInstance(list_item);
-                list_item_dlg.show(frag_trans, "dialog");
+                list_item_dlg.show(frag_trans, "list_item_dialog");
 
                 return true;
             }

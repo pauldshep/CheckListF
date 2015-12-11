@@ -55,6 +55,8 @@ public class CheckListItem
     public final static String PARM_CHECKINTERVAL = "PARM_CHECKINTERVAL";
     public final static String PARM_CHECKSTAMP    = "PARM_CHECKSTAMP";
     public final static String PARM_CHECKTIME     = "PARM_CHECKTIME";
+    public final static String PARM_PHOTO_FILE    = "PARM_PHOTO_FILE";
+    public final static String PARM_INDEX         = "PARM_INDEX";
 
     // parameters associated with a check list item
     public UUID    mUUID          = UUID.randomUUID();
@@ -64,10 +66,12 @@ public class CheckListItem
     public String  mCheckUnits    = "None";
     public Integer mCheckInterval = 0;
     public Integer mCheckStamp    = 0;
-    public Long    mCheckTime     = new Date().getTime();;
+    public Long    mCheckTime     = new Date().getTime();
+    public String  mPhotoFilePath = null;
 
     // check list item support parameters
     public DispOpt mDispOpt       = DispOpt.FULL_DESCRIPTION;
+    public Integer mIndex         = 0;
 
     //==========================================================================
     /**
@@ -83,6 +87,8 @@ public class CheckListItem
         mCheckInterval = 0;
         mCheckStamp    = 0;
         mCheckTime     = new Date().getTime();
+        mPhotoFilePath = null;
+        mIndex         = 0;
     }
 
 
@@ -97,6 +103,7 @@ public class CheckListItem
      * @param interval required check interval in above units
      * @param stamp check interval value when checked
      * @param time time stamp of last check in msecs since 1970
+     * @param filePath directory path to the photo associated with this item
      */
     public CheckListItem(UUID    uuid,
                          boolean checked,
@@ -105,7 +112,8 @@ public class CheckListItem
                          String  units,
                          int     interval,
                          int     stamp,
-                         long    time)
+                         long    time,
+                         String  filePath)
     {
         mUUID          = uuid;
         mTitle         = title;
@@ -115,6 +123,7 @@ public class CheckListItem
         mCheckInterval = interval;
         mCheckStamp    = stamp;
         mCheckTime     = time;
+        mPhotoFilePath = filePath;
 
         mDispOpt       = DispOpt.NO_DESCRIPTION;
     }
@@ -147,6 +156,8 @@ public class CheckListItem
             mCheckInterval = bundle.getInt(PARM_CHECKINTERVAL);
             mCheckStamp    = bundle.getInt(PARM_CHECKSTAMP);
             mCheckTime     = bundle.getLong(PARM_CHECKTIME);
+            mPhotoFilePath = bundle.getString(PARM_PHOTO_FILE);
+            mIndex         = bundle.getInt(PARM_INDEX);
         }
         else
         {
@@ -171,6 +182,8 @@ public class CheckListItem
         bundle.putInt(PARM_CHECKINTERVAL, mCheckInterval);
         bundle.putInt(PARM_CHECKSTAMP,    mCheckStamp);
         bundle.putLong(PARM_CHECKTIME,    mCheckTime);
+        bundle.putString(PARM_PHOTO_FILE, mPhotoFilePath);
+        bundle.putInt(PARM_INDEX,         mIndex);
 
         return bundle;
     }
@@ -178,7 +191,8 @@ public class CheckListItem
 
     //==========================================================================
     /**
-     * Builds file name for the picture associated with this check list item
+     * Builds photograph file name for the picture associated with this check
+     * list item
      */
     public String buildFileName()
     {
@@ -201,11 +215,12 @@ public class CheckListItem
                      "check units = "              + mCheckUnits +
                      ", check interval = "         + mCheckInterval +
                      ", check stamp = "            + mCheckStamp +
-                     ", check time = "             + mCheckTime;
+                     ", check time = "             + mCheckTime +
+                     ", file path = "              + mPhotoFilePath +
+                     ", index = "                  + mIndex;
 
 
         return str;
     }
-
 
 }   // end public class CheckListItem

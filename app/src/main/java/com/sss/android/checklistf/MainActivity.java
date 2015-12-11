@@ -1,5 +1,6 @@
 package com.sss.android.checklistf;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,9 @@ import android.view.MenuItem;
 import java.io.File;
 
 
+/**
+ * Application entry point.
+ */
 public class MainActivity extends AppCompatActivity
         implements  ListItemDlgFragment.OnCheckListItemEditedListener,
                     NowIntervalDlgFragment.OnIntervalNowEditedListener
@@ -22,16 +26,29 @@ public class MainActivity extends AppCompatActivity
 
     private MainActivityFragment mMainActivityFragment;
 
-    private int    mIntervalNow = 0;
-    private String mIntervalUnits = "Unknown";
+    private int             mIntervalNow    = 0;
+    private String          mIntervalUnits  = "Unknown";
+    private DataCheckList   mDataCheckList  = null;
+    private Context         mContext        = null;
 
 
-    //--------------------------------------------------------------------------
+    //==========================================================================
+    /**
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate()");
+
+        // create and intialize checklist data singleton
+        mContext       = getApplicationContext();
+        mDataCheckList = DataCheckList.get(mContext);
+        mDataCheckList.populateForDebug();
+        mDataCheckList.getFromDatabase();
+
 
         //---------------------------------------------------------------------
         // Set initial view from layout resource.  Note this fragment cannot
@@ -62,7 +79,9 @@ public class MainActivity extends AppCompatActivity
         }
 
         //mMainActivityFragment = (MainActivityFragment)
-        //        getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        //  getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+
 
     }  // end protected void onCreate(Bundle savedInstanceState)
 
@@ -141,16 +160,21 @@ public class MainActivity extends AppCompatActivity
 
     //==========================================================================
     /**
-     * Call back function to handle an edited CheckListItem
+     * Call back function to handle an edited CheckListItem.  The new item
+     * parameters are copied to the associated checklist item in the list.
      *
-     * @param checkListItem
+     * @param checkListItem checklist item that has been modified
      */
     @Override
     public void onCheckListItemEdited(CheckListItem checkListItem)
     {
         Log.d(TAG, "onCheckListItemEdited(): " + checkListItem.toString());
+        mDataCheckList.updateCheckListItem(checkListItem);
 
+        MainActivityFragment main_fragment = MainActivityFragment.newInstance();
 
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, main_fragment).commit();
     }
 
 

@@ -36,6 +36,8 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -53,10 +55,8 @@ public class DataCheckList
 
     private static DataCheckList     sDataCheckList;
     private ArrayList<CheckListItem> mCheckListItemList;
-    private Context                  mContext;
     private SQLiteDatabase           mDataBase;
     private String                   mCheckListName = "Name Of Checklist";
-    private int                      mIteratorIndex = 0;
 
 
     //==========================================================================
@@ -85,26 +85,37 @@ public class DataCheckList
      */
     private DataCheckList(Context context)
     {
-        mContext  = context.getApplicationContext();
-        mDataBase = new DatabaseHelper(mContext).getWritableDatabase();
+        Log.d(TAG, "private DataCheckList()");
+        mDataBase = new DatabaseHelper(context).getWritableDatabase();
     }   // end private void DataCheckList()
 
 
-    /**
-     * Returns checklist name
-     */
-    public String getName()
-    {
-        return mCheckListName;
-    }
+//    //========================================================================
+//    /** Required for Parcelable.
+//     *
+//     */
+//    @Override
+//    public int describeContents()
+//    {
+//        return 0;
+//    }
+//
+//
+//    //========================================================================
+//    /**
+//     * Required for Parcelable.  Write object's data to the passed-in Parcel
+//     * @param dest
+//     * @param flags
+//     */
+//    @Override
+//    public void writeToParcel(Parcel dest, int flags)
+//    {
+//
+//    }
 
-    /**
-     * Get checklist list of items from database
-     */
-    public void getFromDatabase()
-    {
-        mCheckListItemList = getItems();
-    }
+
+    public String getName()          { return mCheckListName;            }
+    public void   getFromDatabase()  { mCheckListItemList = getItems();  }
 
     /**
      * get the number of items in the check list
@@ -123,14 +134,19 @@ public class DataCheckList
         return mCheckListItemList.get(position);
     }
 
+
+    //==========================================================================
     /**
-     * Get a list of checklist items from the database
+     * Get a list of checklist items from the database.  Set each item's
+     * index in the list.
      *
      * @return list of checklist items
      */
     private ArrayList<CheckListItem> getItems()
     {
-        ArrayList<CheckListItem> items = new ArrayList<>();
+        ArrayList<CheckListItem> list_items = new ArrayList<>();
+        int                      list_index = 0;
+        CheckListItem            list_item  = null;
 
         // cursor points to particular place in query
         DatabaseCursor cursor = queryItems(null, null);
@@ -140,9 +156,10 @@ public class DataCheckList
             cursor.moveToFirst();
             while(!cursor.isAfterLast())
             {
-                items.add(cursor.getItem());
+                list_item        = cursor.getItem();
+                list_item.mIndex = list_index++;
+                list_items.add(list_item);
                 cursor.moveToNext();
-
             }
         }
         finally
@@ -150,7 +167,7 @@ public class DataCheckList
             cursor.close();
         }
 
-        return items;
+        return list_items;
     }   // end public List<Crime> getCrimes()
 
 
@@ -175,7 +192,6 @@ public class DataCheckList
             {
                 num_entries++;
                 cursor.moveToNext();
-
             }
         }
         finally
@@ -191,7 +207,7 @@ public class DataCheckList
     /**
      * Adds checklist item to the database
      * @param checkListItem check list item to add
-     * @return
+     * @return None
      */
     public void addItemDatabase(CheckListItem checkListItem)
     {
@@ -199,17 +215,21 @@ public class DataCheckList
         mDataBase.insert(DatabaseSchema.TableCheckList.NAME, null, contentValues);
     }
 
+
+    //==========================================================================
     /**
-     * delete specified item from the database
-     * @return
+     * Delete specified item from the database
+     * @return none
      */
     public void deleteItemDatabase()
     {
 
     }
 
+
+    //==========================================================================
     /**
-     * Update specified item in database
+     * Update specified item in database using UUID as item identifier
      * @return
      */
     public void updateItemDatabase(CheckListItem checkListItem)
@@ -218,11 +238,13 @@ public class DataCheckList
         ContentValues values     = getContentValues(checkListItem);
 
         mDataBase.update(DatabaseSchema.TableCheckList.NAME,      // table name
-                values,                            // table ContentValues
+                values,                                           // table ContentValues
                 DatabaseSchema.TableCheckList.Cols.UUID + " = ?", // if UUDI matches string
-                new String[]{uuidString});         // string to match
+                new String[]{uuidString});                        // string to match
     }
 
+
+    //==========================================================================
     /**
      * Sets specified check list item display option
      *
@@ -233,6 +255,74 @@ public class DataCheckList
     {
         CheckListItem item = mCheckListItemList.get(index);
         item.mDispOpt = dispOpt;
+    }
+
+
+    //==========================================================================
+    /**
+     * Update the specified checklist item with the specified new values.  The
+     * entry in the arrayList is updated along with the associated entry in the
+     * database.
+     * @param checkListItem checklist item containing new values
+     */
+    public void updateCheckListItem(CheckListItem checkListItem)
+    {
+        Log.d(TAG, "updateCheckListItem(item = " + checkListItem.toString() + ")");
+        mCheckListItemList.set(checkListItem.mIndex, checkListItem);
+        updateItemDatabase(checkListItem);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////// DEBUG FUNCTIONS /////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    private final static int DEBUG_LIST_SIZE = 10;
+
+
+    //==========================================================================
+    /**
+     * Populates the checklist with items for debug if it is empty.
+     */
+    public void populateForDebug()
+    {
+        int database_size = getDatabaseSize();
+        Log.d(TAG, "populateForDebug(): database entries = " + database_size);
+
+        if(database_size == 0)
+        {
+            Log.d(TAG, "populateForDebug(Num_Items = " + DEBUG_LIST_SIZE + ")");
+            mCheckListName = "2013 KTM 500 EXC";
+
+            UUID    uuid         = UUID.randomUUID();
+            boolean checked      = false;
+            String  title        = "Check List Title";
+            String  desc         = "Dummy String For Debug.  ";
+            String  units        = "Hours";
+            int     interval     = 15;
+            int     stamp        = 10;
+            long    time         = new Date().getTime();
+            String  file_path    = null;
+
+            for(int i = 0; i < DEBUG_LIST_SIZE; i++)
+            {
+                uuid     = new UUID(0, i);
+                checked  = (i % 2 == 0);
+                title    = "Check List Item " + i;
+                desc    += "This is more check list content.  ";
+
+
+                CheckListItem list_item = new CheckListItem(uuid, checked, title,
+                        desc, units, interval, stamp++, time, file_path);
+                list_item.mIndex = i;
+
+                //mCheckListItemList.add(list_item);
+                addItemDatabase(list_item);
+            }
+        }
+        else
+        {
+            Log.d(TAG, "populateForDebug(): database already has entries");
+        }
     }
 
 
@@ -252,6 +342,7 @@ public class DataCheckList
     {
         ContentValues values = new ContentValues();
 
+        values.put(DatabaseSchema.TableCheckList.Cols.UUID,        item.mUUID.toString());
         values.put(DatabaseSchema.TableCheckList.Cols.TITLE,       item.mTitle);
         values.put(DatabaseSchema.TableCheckList.Cols.DESCRIPTION, item.mDesc);
         values.put(DatabaseSchema.TableCheckList.Cols.CHECKED,     item.mChecked ? 1 : 0);
@@ -259,10 +350,13 @@ public class DataCheckList
         values.put(DatabaseSchema.TableCheckList.Cols.INTERVAL,    item.mCheckInterval);
         values.put(DatabaseSchema.TableCheckList.Cols.STAMP,       item.mCheckStamp);
         values.put(DatabaseSchema.TableCheckList.Cols.DATE,        item.mCheckTime);
+        values.put(DatabaseSchema.TableCheckList.Cols.FILE_PATH,   item.mPhotoFilePath);
 
         return values;
     }
 
+
+    //==========================================================================
     /**
      * Get database row information in DatabaseCursor format.
      *
@@ -289,55 +383,7 @@ public class DataCheckList
 
 
     ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////// DEBUG FUNCTIONS /////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-    private final static int DEBUG_LIST_SIZE = 10;
-
-    /**
-     * Populates the checklist with items for debug if it is empty.
-     */
-    public void populateForDebug()
-    {
-        int database_size = getDatabaseSize();
-        Log.d(TAG, "populateForDebug(): database entries = " + database_size);
-
-        if(database_size == 0)
-        {
-            Log.d(TAG, "populateForDebug(Num_Items = " + DEBUG_LIST_SIZE + ")");
-            mCheckListName    = "2013 KTM 500 EXC";
-
-            UUID uuid;
-            boolean checked;
-            String title;
-            String desc     = "Dummy String For Debug.  ";
-            String units    = "Hours";
-            int    interval = 15;
-            int    stamp    = 10;
-            long   time     = new Date().getTime();
-
-            for(int i = 0; i < DEBUG_LIST_SIZE; i++)
-            {
-                uuid     = new UUID(0, i);
-                checked  = (i % 2 == 0);
-                title    = "Check List Item " + i;
-                desc    += "This is more check list content.  ";
-
-
-                CheckListItem list_item = new CheckListItem(uuid, checked, title,
-                        desc, units, interval, stamp++, time);
-                //mCheckListItemList.add(list_item);
-                addItemDatabase(list_item);
-            }
-        }
-        else
-        {
-            Log.d(TAG, "populateForDebug(): database already has entries");
-        }
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////// PRIVATE CLASSES //////////////////////////////
+    ///////////////////// INTERNAL CLASSE DATABASESCHEMA ///////////////////////
     ////////////////////////////////////////////////////////////////////////////
     /**
      * Defines database column entries for CheckList.  These are String
@@ -363,11 +409,17 @@ public class DataCheckList
                 public final static String INTERVAL    = "interval";
                 public final static String STAMP       = "stamp";
                 public final static String DATE        = "date";
+                public final static String FILE_PATH   = "file_path";
 
             }
         }
     }   // end private class DatabaseSchema
 
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////// INTERNAL CLASS DATABASEHELPER ///////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     /**
      * Database helper for Checklist application.  Manages database creation and
      * version management
@@ -377,6 +429,8 @@ public class DataCheckList
         private final static int    VERSION       = 1;
         private final static String DATABASE_NAME = "checklist.db";
 
+
+        //======================================================================
         /**
          * Default Constructor
          */
@@ -404,7 +458,8 @@ public class DataCheckList
                     DatabaseSchema.TableCheckList.Cols.UNITS       + ", " +
                     DatabaseSchema.TableCheckList.Cols.INTERVAL    + ", " +
                     DatabaseSchema.TableCheckList.Cols.STAMP       + ", " +
-                    DatabaseSchema.TableCheckList.Cols.DATE        + ")");
+                    DatabaseSchema.TableCheckList.Cols.DATE        + ", " +
+                    DatabaseSchema.TableCheckList.Cols.FILE_PATH   + ")");
         }
 
 
@@ -425,15 +480,19 @@ public class DataCheckList
     }   // end private class DatabaseHelper extends SQLiteOpenHelper
 
 
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////// INTERNAL CLASS DATABASECURSOR ///////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     /**
      * Encapsulates a database Cursor object for the Checklist database.  The
      * cursor points to a position in the database
      */
     private class DatabaseCursor extends CursorWrapper
     {
+        //======================================================================
         /**
-         * Creates the cursor wrapper for the CheckList database.  The cursor
-         * points to a position in the database.
+         * Constructor: Creates the cursor wrapper for the CheckList database.
+         * The cursor points to a position in the database.
          *
          * @param cursor The underlying cursor to wrap.
          */
@@ -443,6 +502,7 @@ public class DataCheckList
         }
 
 
+        //======================================================================
         /**
          * Get specified checklist item from the database.
          * @return specified CheckListItem
@@ -451,8 +511,7 @@ public class DataCheckList
         {
             // get Crime info from database
             String  uuidString  = getString(getColumnIndex(DatabaseSchema.TableCheckList.Cols.UUID));
-            //UUID    uuid        = UUID.fromString(uuidString);
-            UUID    uuid        = UUID.randomUUID();
+            UUID    uuid        = UUID.fromString(uuidString);
 
             int     is_checked  = getInt(getColumnIndex(DatabaseSchema.TableCheckList.Cols.CHECKED));
             boolean checked     = is_checked == 1 ? true : false;
@@ -460,12 +519,13 @@ public class DataCheckList
             String  title       = getString(getColumnIndex(DatabaseSchema.TableCheckList.Cols.TITLE));
             String  desc        = getString(getColumnIndex(DatabaseSchema.TableCheckList.Cols.DESCRIPTION));
             String  units       = getString(getColumnIndex(DatabaseSchema.TableCheckList.Cols.UNITS));
-            int interval = getInt(getColumnIndex(DatabaseSchema.TableCheckList.Cols.INTERVAL));
-            int stamp = getInt(getColumnIndex(DatabaseSchema.TableCheckList.Cols.CHECKED));
-            long time = getLong(getColumnIndex(DatabaseSchema.TableCheckList.Cols.DATE));
+            int     interval    = getInt(getColumnIndex(DatabaseSchema.TableCheckList.Cols.INTERVAL));
+            int     stamp       = getInt(getColumnIndex(DatabaseSchema.TableCheckList.Cols.CHECKED));
+            long    time        = getLong(getColumnIndex(DatabaseSchema.TableCheckList.Cols.DATE));
+            String  file_path   = getString(getColumnIndex(DatabaseSchema.TableCheckList.Cols.FILE_PATH));
 
             // build and return Crime object from database information
-            CheckListItem item = new CheckListItem(uuid, checked, title, desc, units, interval, stamp, time);
+            CheckListItem item = new CheckListItem(uuid, checked, title, desc, units, interval, stamp, time, file_path);
 
             return item;
         }   // end public CheckListItem getItem()

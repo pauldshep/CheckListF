@@ -49,7 +49,7 @@
     </RelativeLayout>
 
 
-
+    <!-- checklist item long description -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -65,7 +65,10 @@
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
         android:ems="10"
-        android:id="@+id/editTextDesc"/>
+        android:id="@+id/editTextDesc"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:scrollbars="vertical"/>
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -172,6 +175,7 @@
         android:layout_height="wrap_content"
         >
 
+        <!-- timestamp title and value -->
         <TextView
             android:layout_width="85dp"
             android:layout_height="match_parent"
@@ -186,6 +190,7 @@
             android:id="@+id/editTextTimeStamp"
             android:layout_gravity="center_horizontal"
             android:layout_weight="0.03"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Time Stamp"/>
 
     </LinearLayout>
