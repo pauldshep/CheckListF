@@ -59,6 +59,19 @@ public class MainActivityFragment extends Fragment
     private AdapterFullView mAdapterFullView;
     private Context         mContext;
 
+    private OnMainActivityFragmentListener mMainActivityFragmentListener;
+
+
+    //==========================================================================
+    /**
+     * This internal class interface must be implemented by the container
+     * activity (MainActivity).
+     */
+    public interface OnMainActivityFragmentListener
+    {
+        public void onMainActivityFragment(CheckListItem listItem);
+    }
+
 
     //==========================================================================
     /**
@@ -194,8 +207,11 @@ public class MainActivityFragment extends Fragment
                 }
 
                 // display the dialog
-                DialogFragment list_item_dlg = ListItemDlgFragment.newInstance(list_item);
-                list_item_dlg.show(frag_trans, "list_item_dialog");
+                //DialogFragment list_item_dlg = ListItemFragment.newInstance(list_item);
+                //list_item_dlg.show(frag_trans, "list_item_dialog");
+
+                // replace this fragment with the ListItemFragment
+                mMainActivityFragmentListener.onMainActivityFragment(list_item);
 
                 return true;
             }
@@ -206,5 +222,26 @@ public class MainActivityFragment extends Fragment
     }   // end protected void onCreate(Bundle savedInstanceState)
 
 
+    //==========================================================================
+    /**
+     * Called once the fragment is associated with its activity.  Note that
+     * Activity is a subclass of Context
+     */
+    @Override
+    public void onAttach(Context context)
+    {
+        super.onAttach(context);
+        Log.d(TAG, "onAttach()");
+
+        try
+        {
+            mMainActivityFragmentListener = (OnMainActivityFragmentListener)context;
+        }
+        catch(ClassCastException cce)
+        {
+            throw new ClassCastException(context.toString() +
+                    " must implement OnCheckListItemEditedListener");
+        }
+    }
 
 }   // end public class MainActivityFragment extends Fragment

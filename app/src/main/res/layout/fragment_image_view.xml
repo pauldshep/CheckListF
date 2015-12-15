@@ -1,0 +1,56 @@
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="left|top"
+        android:weightSum="1">
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageViewMain"
+        android:src="@drawable/ic_default_image"
+        android:layout_weight="0.54"
+        android:nestedScrollingEnabled="true"
+        android:maxHeight="300dp"
+        android:maxWidth="200dp"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/image_view_use"
+            android:id="@+id/buttonUse"
+            android:layout_weight=".3"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageButtonRotateCW"
+            android:src="@drawable/ic_action_rotate_cw"
+            android:layout_weight=".2"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageButtonRotateCCW"
+            android:src="@drawable/ic_action_rotate_ccw"
+            android:layout_weight="0.2"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/image_view_abort"
+            android:id="@+id/buttonAbort"
+            android:layout_weight=".3"/>
+
+    </LinearLayout>
+
+</LinearLayout>
+

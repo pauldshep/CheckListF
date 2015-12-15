@@ -37,6 +37,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -50,25 +51,23 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ListItemDlgFragment} interface
+ * {@link ListItemFragment} interface
  * to handle interaction events.
- * Use the {@link ListItemDlgFragment#newInstance} factory method to
+ * Use the {@link ListItemFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ListItemDlgFragment extends DialogFragment
+public class ListItemFragment extends Fragment
 {
-    private final static String TAG                 = "ListItemDlgFragment";
+    private final static String TAG                 = "ListItemFragment";
     private final static String KEY_PHOTO_BITMAP    = "key_photo_bitmap";
     private final static String KEY_PHOTO_FILE_PATH = "key_photo_file_path";
     private final static int    TAG_REQUEST_PHOTO   = 1;
@@ -83,8 +82,9 @@ public class ListItemDlgFragment extends DialogFragment
     // system variables
     private Context                         mContext;
     private OnCheckListItemEditedListener   mOnEditedListener;
+    private OnViewImageListener             mOnViewImageListener;
     private String                          mPhotoFileName;
-    private String                          mPhotoFilePath;
+    //private String                        mPhotoFilePath;
     private File                            mPhotoFile;
 
     //==========================================================================
@@ -100,17 +100,29 @@ public class ListItemDlgFragment extends DialogFragment
 
     //==========================================================================
     /**
+     * This internal class interface must be implemented by the container
+     * activity.  This instructs the container activity to switch to the
+     * image View/Edit fragment.
+     */
+    public interface OnViewImageListener
+    {
+        public void onViewImage(CheckListItem checkListItem);
+    }
+
+
+    //==========================================================================
+    /**
      * Use this factory method to create a new instance of this fragment using
      * the provided check list item parameters.
      *
      * @param checkListItem check list item information to display/edit
      *
-     * @return A new instance of fragment ListItemDlgFragment.
+     * @return A new instance of fragment ListItemFragment.
      */
-    public static ListItemDlgFragment newInstance(CheckListItem checkListItem)
+    public static ListItemFragment newInstance(CheckListItem checkListItem)
     {
-        ListItemDlgFragment fragment = new ListItemDlgFragment();
-        Bundle              args     = checkListItem.buildBundle();
+        ListItemFragment fragment = new ListItemFragment();
+        Bundle              args  = checkListItem.buildBundle();
         fragment.setArguments(args);
         return fragment;
     }
@@ -120,7 +132,7 @@ public class ListItemDlgFragment extends DialogFragment
     /**
      * Constructor: required empty public constructor
      */
-    public ListItemDlgFragment() {}
+    public ListItemFragment() {}
 
 
     //==========================================================================
@@ -149,9 +161,9 @@ public class ListItemDlgFragment extends DialogFragment
             Log.e(TAG, "no bundle arguments, creating a new CheckListItem");
         }
 
-        int style = DialogFragment.STYLE_NO_FRAME, theme = 0;
-        theme     = android.R.style.Theme_Holo_Light;
-        setStyle(style, theme);
+        //int style = DialogFragment.STYLE_NO_FRAME, theme = 0;
+        //theme     = android.R.style.Theme_Holo_Light;
+        //setStyle(style, theme);
     }
 
 
@@ -168,6 +180,7 @@ public class ListItemDlgFragment extends DialogFragment
                              Bundle         savedInstanceState)
     {
         Log.d(TAG, "onCreateView(mCheckListItem = " + mCheckListItem.toString() + ")");
+        int color_black = Color.parseColor("#000000");
 
         // Inflate the layout for this fragment
         mContext  = getActivity().getApplicationContext();
@@ -216,7 +229,7 @@ public class ListItemDlgFragment extends DialogFragment
                 mCheckListItem.mDesc  = item_desc.getText().toString();
                 Log.d(TAG, "ButtonUse.onClick(mCheckListItem = " + mCheckListItem.toString() + ")");
                 mOnEditedListener.onCheckListItemEdited(mCheckListItem);
-                dismiss();
+                //dismiss();
             }
         });
 
@@ -232,7 +245,7 @@ public class ListItemDlgFragment extends DialogFragment
             public void onClick(View v)
             {
                 Log.d(TAG, "ButtonAbort.onClick()");
-                dismiss();
+                //dismiss();
             }
         });
 
@@ -251,7 +264,7 @@ public class ListItemDlgFragment extends DialogFragment
             }
             if(savedInstanceState.containsKey(KEY_PHOTO_FILE_PATH))
             {
-                mPhotoFilePath = savedInstanceState.getString(KEY_PHOTO_FILE_PATH);
+                mCheckListItem.mPhotoFilePath = savedInstanceState.getString(KEY_PHOTO_FILE_PATH);
             }
         }
 
@@ -260,6 +273,7 @@ public class ListItemDlgFragment extends DialogFragment
             public void onClick(View v) {
                 // display item image viewer/editor implemented as a fragment dialog
                 Log.d(TAG, "mImageViewItem::onClick()");
+                mOnViewImageListener.onViewImage(mCheckListItem);
             }
         });
 
@@ -268,6 +282,7 @@ public class ListItemDlgFragment extends DialogFragment
         // the check list item.
         //----------------------------------------------------------------------
         mImageButtonTakePicture = (ImageButton)view.findViewById(R.id.imageButtonTakePicture);
+        mImageButtonTakePicture.setColorFilter(color_black);
         mImageButtonTakePicture.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -328,7 +343,7 @@ public class ListItemDlgFragment extends DialogFragment
     {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putParcelable(KEY_PHOTO_BITMAP, mPhotoBitmap);
-        savedInstanceState.putString(KEY_PHOTO_FILE_PATH,  mPhotoFilePath);
+        savedInstanceState.putString(KEY_PHOTO_FILE_PATH,  mCheckListItem.mPhotoFilePath);
     }
 
 
@@ -345,7 +360,8 @@ public class ListItemDlgFragment extends DialogFragment
 
         try
         {
-            mOnEditedListener = (OnCheckListItemEditedListener)context;
+            mOnEditedListener    = (OnCheckListItemEditedListener)context;
+            mOnViewImageListener = (OnViewImageListener)context;
         }
         catch(ClassCastException cce)
         {
@@ -423,9 +439,9 @@ public class ListItemDlgFragment extends DialogFragment
      */
     private void updateChecklistItemPhoto()
     {
-        Log.d(TAG, "updateChecklistItemPhoto(file path = " + mPhotoFilePath + ")");
-        if(mPhotoFilePath == null)  return;
-        if(mPhotoView     == null)  return;
+        Log.d(TAG, "updateChecklistItemPhoto(file path = " + mCheckListItem.mPhotoFilePath + ")");
+        if(mCheckListItem.mPhotoFilePath == null)  return;
+        if(mPhotoView                    == null)  return;
 
         // get the dimensions of the display ImageView
         int targetW = mPhotoView.getMaxWidth();
@@ -436,7 +452,7 @@ public class ListItemDlgFragment extends DialogFragment
         // get the dimensions of the bitmap
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds    = true;
-        BitmapFactory.decodeFile(mPhotoFilePath, bmOptions);
+        BitmapFactory.decodeFile(mCheckListItem.mPhotoFilePath, bmOptions);
         int photoW = bmOptions.outWidth;
         int photoH = bmOptions.outHeight;
         Log.d(TAG, "updateChecklistItemPhoto(photoW = " + photoW +
@@ -450,14 +466,14 @@ public class ListItemDlgFragment extends DialogFragment
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize       = scaleFactor;
 
-        mPhotoBitmap = BitmapFactory.decodeFile(mPhotoFilePath, bmOptions);
+        mPhotoBitmap = BitmapFactory.decodeFile(mCheckListItem.mPhotoFilePath, bmOptions);
 
         if(mPhotoBitmap != null)
         {
             mPhotoView.setImageBitmap(mPhotoBitmap);
-            mCheckListItem.mPhotoFilePath = mPhotoFilePath;
+            // mCheckListItem.mPhotoFilePath = mPhotoFilePath;
         }
-    }
+    }   // end private void updateChecklistItemPhoto()
 
 
     //==========================================================================
@@ -486,9 +502,9 @@ public class ListItemDlgFragment extends DialogFragment
         // try to create the file for the picture
         mPhotoFileName = mCheckListItem.buildFileName();
         mPhotoFile     = new File(pict_dir, mPhotoFileName);
-        mPhotoFilePath = mPhotoFile.getAbsolutePath();
+        mCheckListItem.mPhotoFilePath = mPhotoFile.getAbsolutePath();
 
-        Log.d(TAG, "createFileForPhotograph(file = " + mPhotoFilePath + ")");
+        Log.d(TAG, "createFileForPhotograph(file = " + mCheckListItem.mPhotoFilePath + ")");
 
         return Uri.fromFile(mPhotoFile);
     }   // end private Uri createFileForPhotograph()

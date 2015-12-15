@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.plus.model.people.Person;
+
 import java.io.File;
 
 
@@ -19,8 +21,12 @@ import java.io.File;
  * Application entry point.
  */
 public class MainActivity extends AppCompatActivity
-        implements  ListItemDlgFragment.OnCheckListItemEditedListener,
-                    NowIntervalDlgFragment.OnIntervalNowEditedListener
+        implements  ListItemFragment.OnCheckListItemEditedListener,
+                    ListItemFragment.OnViewImageListener,
+                    ImageViewFragment.OnEditImageListener,
+                    NowIntervalDlgFragment.OnIntervalNowEditedListener,
+                    MainActivityFragment.OnMainActivityFragmentListener
+
 {
     private final static String TAG = "MainActivity";
 
@@ -34,7 +40,6 @@ public class MainActivity extends AppCompatActivity
 
     //==========================================================================
     /**
-     *
      * @param savedInstanceState
      */
     @Override
@@ -43,7 +48,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate()");
 
-        // create and intialize checklist data singleton
+        // create and initialize checklist data singleton
         mContext       = getApplicationContext();
         mDataCheckList = DataCheckList.get(mContext);
         mDataCheckList.populateForDebug();
@@ -157,6 +162,21 @@ public class MainActivity extends AppCompatActivity
     ////////////////////////////////////////////////////////////////////////////
     /////////////////////// FRAGMENT CALLBACK FUNCTIONS ////////////////////////
     ////////////////////////////////////////////////////////////////////////////
+    //==========================================================================
+    /**
+     * Call back function to handle messages from the MainActivityFragment
+     */
+    @Override
+    public void onMainActivityFragment(CheckListItem checkListItem)
+    {
+        Log.d(TAG, "onMainActivityFragment(checkListItem = " + checkListItem + ")");
+
+        ListItemFragment list_item_fragment = ListItemFragment.newInstance(checkListItem);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, list_item_fragment).commit();
+    }
+
 
     //==========================================================================
     /**
@@ -189,6 +209,45 @@ public class MainActivity extends AppCompatActivity
     {
         Log.d(TAG, "OnIntervalNowEdited(): interval = " + intervalNow);
         mIntervalNow = intervalNow;
+    }
+
+
+    //==========================================================================
+    /**
+     * Call back function to handle the viewing of the image associated with a
+     * check list item
+     *
+     * @param checkListItem checklist item with image file path
+     */
+    @Override
+    public void onViewImage(CheckListItem checkListItem)
+    {
+        Log.d(TAG, "onViewImage(): " + checkListItem.toString());
+
+        ImageViewFragment image_view_fragment =
+                ImageViewFragment.newInstance(checkListItem);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, image_view_fragment).commit();
+    }
+
+
+    //==========================================================================
+    /**
+     * Call back function to handle the editing of the image associated with a
+     * check list item.
+     *
+     * @param checkListItem checklist item with image file path
+     */
+    @Override
+    public void onEditImage(CheckListItem checkListItem)
+    {
+        Log.d(TAG, "onEditImage(): " + checkListItem.toString());
+
+        ListItemFragment list_item_fragment = ListItemFragment.newInstance(checkListItem);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, list_item_fragment).commit();
     }
 
 
